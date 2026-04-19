@@ -10,40 +10,18 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 # Import the logistic regression model from LR.py
 from LR import LogisticRegressionModel
+from data_load import load_data
+
+
+print("CountVectorizer Model")
+print("-----"*100)
 
 # Check for CUDA availability, if none just use CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# Load the data 
-try:
-    data = pd.read_csv('Compiled_Reviews.txt', sep='\t')
-    print("Data loaded successfully. Columns:", data.columns.tolist())
-except Exception as e:
-    print(f"Error loading data: {e}")
-    exit()
-
-texts = data['REVIEW'].fillna('').values  
-label_mapping ={'positive': 1, 'negative': 0}
-labels = data['RATING'].map(label_mapping).astype(int).values
-
-# For this we try to one hot encode the reviews 
-# Limit to top 5000 features for simplicity
-vectorizer = CountVectorizer(max_features=5000)
-X = vectorizer.fit_transform(texts).toarray()
-Y = labels
-
-# Split data into training and testing sets
-# For this we just use 20 percent for testing, 80 percent for training
 np.random.seed(42)  # For reproducibility
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.2)
-
-
-X_train = torch.tensor(X_train, dtype=torch.float32).to(device)
-y_train = torch.tensor(y_train, dtype=torch.float32).to(device)
-X_test = torch.tensor(X_test, dtype=torch.float32).to(device)
-y_test = torch.tensor(y_test, dtype=torch.float32).to(device)
-
+X_train, y_train, X_test, y_test = load_data(x_data='REVIEW', y_data='RATING', label_mapping={'positive': 1, 'negative': 0}, device=device, vectorizer=CountVectorizer, max_features=5000)
 # Building the logistic regression model
 # We will try to modify the number of layers to see if they have an effect
 
@@ -73,6 +51,8 @@ for epoch in range(num_epochs):
     avg_loss = epoch_loss / len(train_loader)
     print(f"Epoch {epoch+1}/{num_epochs}, Avg Loss: {avg_loss:.4f}")
 
+# Saving the model
+torch.save(model.state_dict(), 'Count_Model.pt')
 
 # Validation (optional, to tune)
 model.eval()

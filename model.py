@@ -10,40 +10,26 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Import the logistic regression model from LR.py
 from LR import LogisticRegressionModel
+from data_load import load_data
+
+print("TF-IDF Vectorizer Model")
+print("-----"*100)
 
 # Check for CUDA availability, if none just use CPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
-# Load the data 
-try:
-    data = pd.read_csv('Compiled_Reviews.txt', sep='\t')
-    print("Data loaded successfully. Columns:", data.columns.tolist())
-except Exception as e:
-    print(f"Error loading data: {e}")
-    exit()
 
-texts = data['REVIEW'].fillna('').values
-label_mapping = {'positive': 1, 'negative': 0}
-labels = data['RATING'].map(label_mapping).astype(int).values
+np.random.seed(42)  # For reproducibility
+X_train, y_train, X_test, y_test = load_data(
+    x_data='REVIEW', 
+    y_data='RATING', 
+    label_mapping={'positive': 1, 'negative': 0}, 
+    device=device, vectorizer=TfidfVectorizer, 
+    max_features=5000, 
+    test_size=0.3
+)
 
-
-# Vectorise with TF-IDF in this run
-# Limit to top 5000 features for simplicity and so that it can reasonably run
-vectorizer = TfidfVectorizer(max_features=5000)
-X = vectorizer.fit_transform(texts).toarray()
-Y = labels
-
-# Split data into training and testing sets
-# 30 percent for testing 
-np.random.seed(42)  
-X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.3)
-
-
-X_train = torch.tensor(X_train, dtype=torch.float32).to(device)
-y_train = torch.tensor(y_train, dtype=torch.float32).to(device)
-X_test = torch.tensor(X_test, dtype=torch.float32).to(device)
-y_test = torch.tensor(y_test, dtype=torch.float32).to(device)
 
 # Building the logistic regression model
 # To ensure efficiency on GPU, TensorLoader and DataLoader to handle batching
@@ -73,6 +59,8 @@ for epoch in range(num_epochs):
     # Reporting for every epoch 
     print(f"Epoch {epoch+1}/{num_epochs}, Avg Loss: {avg_loss:.2f}")
 
+# Saving the model 
+torch.save(model.state_dict(), 'TFIDF_Model.pt')
 
 # Evaluation on test set
 with torch.no_grad():

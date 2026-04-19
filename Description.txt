@@ -1,0 +1,47 @@
+ 
+
+                  		LELA60342 Programming Assignment 
+
+  
+
+Using the Computational Shared Facility, perform the following: 
+
+ 
+
+Implement a logistic regression classifier (model 1) for the sentiment classification of the Amazon reviews data used for your Computational Linguistics 1 coursework (available here). Implement it using PyTorch (for at least model specification, the backwards step, loss function and optimisation). This should run on the GPU using cuda. 
+
+Make additions to the model (creating model 2) to try to improve performance. 
+
+Calculate the area under the curve (AUC) value for both classifiers. 
+
+Use bootstrapping to generate a p-value that tests whether the AUC for model 2 is significantly higher than the AUC for model 1. 
+
+ 
+
+All steps must be performed on the CSF, and you should produce a github repository containing: 
+
+The Python code (in a .py file)  for all steps of training and evaluation of the model. 
+
+The Slurm Script for running the model on the CSF. 
+
+The output from your model run including the results. This can be in a slurm*.out file or have been written to another file.  
+
+The README file for the repository should contain a brief description of the models run and the results obtained.  
+
+ 
+
+A file containing the anonymised link to the github repository (produced using https://anonymous.4open.science/) should be uploaded on Canvas by 20th April at 14:00. 
+
+ 
+
+The assignment will be worth 10% of your final grade for the module. Marks will be awarded for the following: 
+
+The design and implementation of your models, including their training and testing (3 marks) 
+
+The implementation of your research pipeline (3 marks) 
+
+The description and discussion of the models included in the README (2 marks) 
+
+The description and discussion of the results included in the README (2 marks) 
+
+ 
